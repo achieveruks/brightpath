@@ -1,22 +1,29 @@
 import React, { useState } from 'react'
 import { PageHeader } from '../components/common/PageHeader'
-import { ShieldCheck, User, Database, CheckCircle2, AlertTriangle, Settings2 } from 'lucide-react'
+import { ShieldCheck, User, Database, CheckCircle2, AlertTriangle, Settings2, KeyRound } from 'lucide-react'
 import { getSupabaseConfigStatus } from '../lib/supabaseClient'
 import { SetupGuideModal } from '../components/common/SetupGuideModal'
+import { useAuth } from '../context/AuthContext'
 
 export const SettingsPage: React.FC = () => {
   const [modalOpen, setModalOpen] = useState(false)
   const [configStatus, setConfigStatus] = useState(() => getSupabaseConfigStatus())
+  const { user, profile } = useAuth()
 
   const refreshStatus = () => {
     setConfigStatus(getSupabaseConfigStatus())
   }
 
+  const roleBootstrapSql = `-- Run this in Supabase SQL Editor to make your account an Administrator:
+UPDATE public.profiles 
+SET role = 'admin' 
+WHERE id = (SELECT id FROM auth.users WHERE email = '${user?.email || 'your-email@example.com'}');`
+
   return (
     <div>
       <PageHeader
         title="Settings &amp; Preferences"
-        description="User profile details, access role privileges, and Supabase backend configuration."
+        description="Staff profile details, role privileges, and Supabase backend architecture."
       />
 
       <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem', maxWidth: '800px' }}>
@@ -28,23 +35,61 @@ export const SettingsPage: React.FC = () => {
               My Profile
             </h2>
           </div>
-          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(240px, 1fr))', gap: '1rem' }}>
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))', gap: '1rem' }}>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
                 Full Name
               </label>
-              <input type="text" className="form-input" value="BrightPath Staff" disabled />
+              <input
+                type="text"
+                className="form-input"
+                value={profile?.full_name || 'Staff Member'}
+                disabled
+              />
+            </div>
+            <div>
+              <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
+                Email Address
+              </label>
+              <input
+                type="text"
+                className="form-input"
+                value={user?.email || 'Not logged in'}
+                disabled
+              />
             </div>
             <div>
               <label style={{ display: 'block', fontSize: '0.85rem', fontWeight: 600, color: 'var(--text-muted)', marginBottom: '0.35rem' }}>
                 Assigned Role
               </label>
-              <input type="text" className="form-input" value="Counsellor (Default)" disabled />
+              <input
+                type="text"
+                className="form-input"
+                style={{ fontWeight: 600, color: 'var(--color-brand-600)' }}
+                value={(profile?.role || 'counsellor').toUpperCase()}
+                disabled
+              />
             </div>
           </div>
           <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: '0.75rem' }}>
-            User roles are secured via PostgreSQL Row Level Security and cannot be modified directly via client requests.
+            User roles are secured via PostgreSQL Row Level Security. Clients cannot self-promote by modifying role columns.
           </p>
+        </div>
+
+        {/* Administrator Role Bootstrap Guide */}
+        <div className="card">
+          <div style={{ display: 'flex', alignItems: 'center', gap: '0.6rem', marginBottom: '0.85rem' }}>
+            <KeyRound size={20} color="#f59e0b" />
+            <h2 style={{ fontSize: '1.05rem', fontWeight: 700, color: 'var(--text-main)' }}>
+              Administrator Bootstrap Guide
+            </h2>
+          </div>
+          <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.5, marginBottom: '0.75rem' }}>
+            All new staff accounts default to <code>counsellor</code>. To promote your account to <code>admin</code> or <code>manager</code>, run this query in your Supabase SQL Editor:
+          </p>
+          <div className="code-snippet-box">
+            <span style={{ fontSize: '0.8rem', wordBreak: 'break-all' }}>{roleBootstrapSql}</span>
+          </div>
         </div>
 
         {/* Supabase Diagnostics Card */}
@@ -87,12 +132,12 @@ export const SettingsPage: React.FC = () => {
               )}
               <span style={{ fontSize: '0.875rem', fontWeight: 600, color: configStatus.isConfigured ? '#047857' : '#92400e' }}>
                 {configStatus.isConfigured
-                  ? 'Supabase Client Initialized & Ready'
+                  ? 'Supabase Client Initialized & Active'
                   : 'Configuration Needed in .env'}
               </span>
             </div>
             <span style={{ fontSize: '0.75rem', color: 'var(--text-muted)', fontFamily: 'monospace' }}>
-              {configStatus.isConfigured ? 'Live Config' : 'Waiting for Keys'}
+              {configStatus.isConfigured ? 'Live Connection' : 'Waiting for Keys'}
             </span>
           </div>
 
@@ -124,7 +169,7 @@ export const SettingsPage: React.FC = () => {
             </h2>
           </div>
           <p style={{ fontSize: '0.875rem', color: 'var(--text-muted)', lineHeight: 1.6 }}>
-            Vite exposes <code>VITE_</code> prefixed variables publicly to browser clients. Only the public anon key is bundled. Row Level Security (RLS) is applied at the database level to ensure data isolation between counsellors, managers, and administrators.
+            Frontend route guards improve navigational UX. All authoritative authorization is strictly enforced at the database layer via PostgreSQL Row Level Security (RLS).
           </p>
         </div>
       </div>

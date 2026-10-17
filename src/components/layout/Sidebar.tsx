@@ -7,7 +7,9 @@ import {
   BarChart3,
   Settings,
   GraduationCap,
+  LogOut,
 } from 'lucide-react'
+import { useAuth } from '../../context/AuthContext'
 
 interface SidebarProps {
   isOpen: boolean
@@ -23,6 +25,17 @@ const navItems = [
 ]
 
 export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
+  const { user, profile, signOut } = useAuth()
+
+  const displayName = profile?.full_name || user?.email?.split('@')[0] || 'Staff Member'
+  const displayRole = profile?.role || 'counsellor'
+  const initials = displayName
+    .split(' ')
+    .map((n) => n[0])
+    .join('')
+    .slice(0, 2)
+    .toUpperCase()
+
   return (
     <aside className={`app-sidebar ${isOpen ? 'open' : ''}`}>
       {/* Brand Header */}
@@ -59,12 +72,36 @@ export const Sidebar: React.FC<SidebarProps> = ({ isOpen, onCloseMobile }) => {
       <div className="sidebar-footer">
         <div className="user-profile-pill">
           <div className="user-avatar" aria-hidden="true">
-            BP
+            {initials}
           </div>
           <div className="user-meta">
-            <span className="user-name">BrightPath Staff</span>
-            <span className="user-role-badge">Demo Mode</span>
+            <span className="user-name" title={displayName}>
+              {displayName}
+            </span>
+            <span className="user-role-badge">
+              {displayRole}
+            </span>
           </div>
+          {user && (
+            <button
+              type="button"
+              onClick={() => signOut()}
+              title="Sign Out"
+              aria-label="Sign Out"
+              style={{
+                color: '#94a3b8',
+                padding: '0.35rem',
+                borderRadius: 'var(--radius-sm)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+              onMouseEnter={(e) => (e.currentTarget.style.color = '#ef4444')}
+              onMouseLeave={(e) => (e.currentTarget.style.color = '#94a3b8')}
+            >
+              <LogOut size={16} />
+            </button>
+          )}
         </div>
       </div>
     </aside>
