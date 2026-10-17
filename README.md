@@ -1,20 +1,42 @@
-<<<<<<< HEAD
-# React + Vite
+# BrightPath CRM
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+A modern, secure student lead management and admissions CRM for **BrightPath Academy**, built with React 19, TypeScript, Vite, and Supabase.
 
-Currently, two official plugins are available:
+## Tech Stack
+- **Frontend**: React 19, TypeScript, Vite, React Router, Lucide Icons, Vanilla CSS
+- **Backend / Database**: Supabase PostgreSQL with Row Level Security (RLS)
+- **Authentication**: Supabase Auth (Email / Password)
+- **Deployment**: Vercel
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+## Local Development Setup
 
-## React Compiler
+### 1. Prerequisites
+- Node.js 18+ (Node 20+ recommended)
+- npm or pnpm
+- A Supabase project
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+### 2. Installation
+```bash
+npm install
+```
 
-## Expanding the ESLint configuration
+### 3. Environment Variables
+Copy `.env.example` to `.env`:
+```bash
+cp .env.example .env
+```
+Populate with your Supabase credentials:
+```env
+VITE_SUPABASE_URL=https://your-project-id.supabase.co
+VITE_SUPABASE_ANON_KEY=your-public-client-anon-key
+```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
-=======
-# brightpath
->>>>>>> 99d85234db92f38db6e0e1e4857a7049382dc43c
+### 4. Running Locally
+```bash
+npm run dev
+```
+
+### 5. Typecheck & Build
+```bash
+npm run build
+```
